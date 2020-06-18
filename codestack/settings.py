@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'products.apps.ProductsConfig',
     'accounts.apps.AccountsConfig',
+    'otpverify.apps.OtpverifyConfig',
 ]
 
 MIDDLEWARE = [
