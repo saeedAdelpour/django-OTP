@@ -1,1 +1,23 @@
-home
+{% extends 'base.html' %}
+
+{% block content %}
+<hr />
+
+<p>login - logout</p>
+
+<ul>
+  <li><a href="{% url 'login' %}?next=/">login</a></li>
+  <li><a href="{% url 'logout' %}?next=/">logout</a></li>
+</ul>
+
+<hr />
+
+<p>paths  </p>
+
+<ul>
+  <li><a href="{% url 'about' %}">about</a></li>
+  <li><a href="{% url 'someview' %}">someview</a></li>
+</ul>
+
+<hr />
+{% endblock %}
