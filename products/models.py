@@ -15,10 +15,11 @@ from .validators import saeedValidate, signValidate
 class Product(models.Model):
   title = models.CharField(max_length=15, unique=True, error_messages={'unique': 'not unique'}, help_text='your post title')
   slug = models.SlugField(null=True, blank=True)
-  add_on = models.DateTimeField(auto_now=True)
-  update_on = models.DateTimeField(default=timezone.now)
+  publish_on = models.DateField(auto_now=False, auto_now_add=False, default=timezone.now)
   publish = models.CharField(max_length=15, choices=PUBLISH_CHOICES, default='draft')
   email = models.EmailField(max_length=200, null=True, blank=True)
+  update_on = models.DateTimeField(auto_now=True)
+  timestamp = models.DateTimeField(auto_now_add=True)
 
   # for naming in django admin
   class Meta:
