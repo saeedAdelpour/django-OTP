@@ -12,6 +12,11 @@ PUBLISH_CHOICES = [
   ('private', 'Private'),
 ]
 
+class ProductManager(models.Manager):
+  def all(self, *args, **kwargs):
+    qs = super(ProductManager, self).all(*args, **kwargs).filter(title__icontains='mahsol')
+    return qs
+
 from .validators import saeedValidate, signValidate
 
 class Product(models.Model):
@@ -22,6 +27,8 @@ class Product(models.Model):
   email = models.EmailField(max_length=200, null=True, blank=True)
   update_on = models.DateTimeField(auto_now=True)
   timestamp = models.DateTimeField(auto_now_add=True)
+
+  objects = ProductManager()
 
   # for naming in django admin
   class Meta:
