@@ -12,9 +12,16 @@ PUBLISH_CHOICES = [
   ('private', 'Private'),
 ]
 
+class ProductQuerySet(models.QuerySet):
+  def mahsol(self):
+    return self.filter(title__icontains='mahsol')
+
 class ProductManager(models.Manager):
+  def get_queryset(self):
+    return ProductQuerySet(self.model, using=self._db)
+
   def all(self, *args, **kwargs):
-    qs = super(ProductManager, self).all(*args, **kwargs).filter(title__icontains='mahsol')
+    qs = self.get_queryset()
     return qs
 
 from .validators import saeedValidate, signValidate
