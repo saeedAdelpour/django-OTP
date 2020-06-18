@@ -1,6 +1,8 @@
+from datetime import timedelta, datetime, date
 from django.db import models
 from django.utils.encoding import smart_text
 from django.utils import timezone
+from django.utils.timesince import timesince
 from django.utils.text import slugify
 from django.db.models.signals import post_save, pre_save
 
@@ -29,6 +31,18 @@ class Product(models.Model):
 
   def __str__(self):
     return smart_text(self.title)
+
+  @property
+  def age(self):
+    now = datetime.now()
+    publish_time = datetime.combine(self.publish_on, datetime.now().min.time())
+    try:
+      difference = now - publish_time
+    except:
+      return 'unknown'
+    if difference <= timedelta(minutes=1):
+      return 'just now'
+    return "{} ago".format(timesince(publish_time).split(", ")[0])
 
   # not recommanded
   def save(self, *args, **kwargs):
