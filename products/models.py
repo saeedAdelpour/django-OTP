@@ -13,7 +13,7 @@ PUBLISH_CHOICES = [
 from .validators import saeedValidate, signValidate
 
 class Product(models.Model):
-  title = models.CharField(max_length=15)
+  title = models.CharField(max_length=15, unique=True, error_messages={'unique': 'not unique'}, help_text='your post title')
   slug = models.SlugField(null=True, blank=True)
   add_on = models.DateTimeField(auto_now=True)
   update_on = models.DateTimeField(default=timezone.now)
