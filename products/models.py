@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.encoding import smart_text
 from django.utils import timezone
 from django.utils.text import slugify
+from django.db.models.signals import post_save, pre_save
 
 PUBLISH_CHOICES = [
   ('draft', 'Draft'),
@@ -30,6 +31,16 @@ class Product(models.Model):
 
   # not recommanded
   def save(self, *args, **kwargs):
-    if not self.slug and self.title:
-      self.slug = slugify(self.title)
     super().save(*args, **kwargs)
+
+def product_pre_save_reciever(sender, instance, *args, **kwargs):
+  instance.update_on = timezone.now()
+  if not instance.slug and instance.title:
+    instance.slug = slugify(instance.title)
+
+pre_save.connect(product_pre_save_reciever, sender=Product)
+
+def product_post_save_reciever(sender, instance, created, *args, **kwargs):
+  print('after save')
+
+post_save.connect(product_post_save_reciever, sender=Product)
