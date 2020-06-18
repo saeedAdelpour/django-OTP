@@ -14,6 +14,7 @@ class ProductAdmin(admin.ModelAdmin):
     'age',
   ]
   readonly_fields = ['update_on', 'timestamp', 'overall_content', 'age']
+  list_display = ['title', 'publish_on']
 
   def overall_content(self, instance, *args,  **kwargs):
     return " / ".join([

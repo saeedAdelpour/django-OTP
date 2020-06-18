@@ -24,6 +24,12 @@ class ProductManager(models.Manager):
     qs = self.get_queryset()
     return qs
 
+  def dateframe(self, date1, date2):
+    qs = self.get_queryset()
+    qs1 = qs.filter(publish_on__lte=date2)
+    qs2 = qs1.filter(publish_on__gte=date1)
+    return qs2
+
 from .validators import saeedValidate, signValidate
 
 class Product(models.Model):
