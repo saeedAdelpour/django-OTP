@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+{{ error }}
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="number" name="otp_number" placeholder="enter verification number" />
+
+  <input type="submit" />
+</form>
+
+
+
+
+
+
+
+
+{% endblock %}

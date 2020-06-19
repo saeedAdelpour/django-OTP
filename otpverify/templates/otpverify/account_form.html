@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if post %}{{ post }}{% else %}no post found{% endif %}
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <input type="number " name="phone_number" placeholder="phone number" />
+
+  <input type="submit" />
+</form>
+{% endblock %}

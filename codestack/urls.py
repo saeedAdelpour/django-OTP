@@ -24,4 +24,6 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
     path('about/', AboutTemplateView.as_view(), name='about'),
     path('someview/', MyTemplateView.as_view(template_name='products/template.html'), name='someview'),
+    path('verify/', include('otpverify.urls')),
+
 ]
