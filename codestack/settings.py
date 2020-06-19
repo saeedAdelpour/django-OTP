@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'products.apps.ProductsConfig',
     'accounts.apps.AccountsConfig',
     'otpverify.apps.OtpverifyConfig',
+    'otpapi.apps.OtpapiConfig',
 ]
 
 MIDDLEWARE = [
