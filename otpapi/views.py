@@ -39,25 +39,30 @@ algorithm = "HS256"
 
 @csrf_exempt
 def verify(request):
-  otp = request.POST.get(form_otp_code)
-  number = request.POST.get(form_phone_numebr)
   user_agent = request.META.get("HTTP_USER_AGENT")
+  if not user_agent:
+    return JsonResponse({"message": "empty user agent"})
+
+  number = request.POST.get(form_phone_number)
+  if not number:
+    return JsonResponse({"message": "enter phone number"})
+
+  otp = request.POST.get(form_otp_code)
+  if not otp:
+    return JsonResponse({"message": "enter code"})
 
   try:
     client = Client.objects.get(otp=otp, number=number)
-    session = Session.objects.get(client=client)
+    session = Session.objects.get(client=client, user_agent=user_agent)
+  except:
+    return JsonResponse({"message": "invalid data"})
+
     payload = {"id": session.id}
-    token = jwt.encode(payload, key, algorithm).decode('utf-8')
+  token = jwt.encode(payload, key, algorithm).decode("utf-8")
     # client.set_none_otp()
     # client.save()
-    message = "token created"
-  except:
-    token = None
-    message = "invalid code. try again"
-
   
-  response = {"message": message, "token": token}
-  return JsonResponse(response)
+  return JsonResponse({"message": "success", "token": token})
 
 @csrf_exempt
 def create(request):
