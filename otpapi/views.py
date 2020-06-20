@@ -66,26 +66,33 @@ def create(request):
     return JsonResponse({"message": "your token is empty"})
 
   token = token_header[7:]
-  name = request.POST.get("name")
-  user_agent = request.META.get("HTTP_USER_AGENT")
-
-  payload = None
   try:
     payload = jwt.decode(token, key, algorithm)
-    message = "token decoded"
   except:
-    message = "your token is invalid"
+    return JsonResponse({"message": "invalid data form token got"})
 
-  if payload:
-    try:
+  user_agent = request.META.get("HTTP_USER_AGENT")
+  if not user_agent:
+    return JsonResponse({"message": "user_agent is empty"})
+
       identity = payload.get("id")
       session = Session.objects.get(id=identity, user_agent=user_agent)
-      client = Client.objects.get(id=session.client.id)
-      message = "logged in"
+  client = session.client
+
+  name = request.POST.get("name")
+  if not name:
+    return JsonResponse({"message": "your name is empty"})
 
       if not client.name:
         client.name = name
+  else:
+    message = "{}, can't change your name".format(client.name)
+  
+  client.login()
         client.save()
+    
+  return JsonResponse({"message": message})
+
 @csrf_exempt
 def change(request):
 
