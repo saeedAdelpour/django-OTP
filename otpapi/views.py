@@ -86,11 +86,34 @@ def create(request):
       if not client.name:
         client.name = name
         client.save()
-      else:
-        message = "cant change name"
-        
-    except:
-      message = "problem"
+@csrf_exempt
+def change(request):
 
-  response = {"message": message}
-  return JsonResponse(response)
+  # check token
+  tolen_header = request.META.get("HTTP_AUTHORIZATION")
+  if not tolen_header:
+    return JsonResponse({"message": "empty token"})
+        
+  # check payload
+  token = tolen_header[7:]
+  try:
+    payload = jwt.decode(token, key, algorithm)
+    except:
+    return JsonResponse({"message": "invalid token"})
+  
+  identity = payload.get("id")
+  session = Session.objects.get(id=identity)
+  client = session.client
+
+  if not client.is_auth():
+    return JsonResponse({"message": "login first"})
+  
+  new_name = request.POST.get(form_change_name)
+  if not new_name:
+    return JsonResponse({"message": "no name got"})
+
+  message = "{}, you successfully change your name to {}".format(client.name, new_name)
+  client.name = new_name
+  client.save()
+
+  return JsonResponse({"message": message})
