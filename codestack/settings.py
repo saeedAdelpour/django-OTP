@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'products.apps.ProductsConfig',
     'accounts.apps.AccountsConfig',
     'otpverify.apps.OtpverifyConfig',
