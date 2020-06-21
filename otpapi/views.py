@@ -87,14 +87,13 @@ def create(request):
   session = Session.objects.get(id=identity, user_agent=user_agent)
   client = session.client
 
-  name = request.POST.get("name")
-  if not name:
-    return JsonResponse({"message": "your name is empty"})
-
   if not client.name:
+    name = request.POST.get("name")
+    if not name:
+      return JsonResponse({"message": "your name is empty"})
     client.name = name
-  else:
-    message = "{}, can't change your name".format(client.name)
+    
+  message = "{}, successfully logged in".format(client.name)
   
   client.login()
   client.save()
