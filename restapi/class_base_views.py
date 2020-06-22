@@ -19,20 +19,19 @@ class SnippetList(mixins.ListModelMixin,
   def post(self, request, *args, **kwargs):
       return self.create(request, *args, **kwargs)
 
+class SnippetDetail(mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
+                    generics.GenericAPIView):
+  
+  queryset = Snippet.objects.all()
+  serializer_class = SnippetSerializer
 
-  def get(self, request, pk, format=None):
-    snippet = self.get_object(pk)
-    serializer = SnippetSerializer(snippet)
-    return Response(serializer.data)
+  def get(self, request, *args, **kwargs):
+    return super().retrieve(request, *args, **kwargs)
 
-  def put(self, request, pk, format=None):
-    snippet = self.get_object(pk)
-    serializer = SnippetSerializer(snippet, data=request.data)
-    if serializer.is_valid():
-      return Response(serializer.data)
-    return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+  def post(self, request, *args, **kwargs):
+    return super().update(request, *args, **kwargs)
 
-  def delete(self, request, pk, format=None):
-    snippet = self.get_object(pk)
-    snippet.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
+  def delete(self, request, *args, **kwargs):
+    return super().destroy(request, *args, **kwargs)
