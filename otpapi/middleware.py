@@ -1,8 +1,8 @@
 from django.db.utils import DataError
 from psycopg2.errors import NumericValueOutOfRange
 from django.http.response import JsonResponse
-from django.core.exceptions import FieldDoesNotExist
-from .models import Client
+from django.core.exceptions import EmptyResultSet
+from .models import Client, Session
 from jwt.exceptions import InvalidSignatureError
 
 class SimpleMiddleware:
@@ -34,13 +34,13 @@ class SimpleMiddleware:
     if exception_type is DataError:
       exception_message = "out of range data"
 
-    elif exception_type is FieldDoesNotExist:
+    elif exception_type is EmptyResultSet:
       exception_message = str(exception)
 
     elif exception_type is ValueError:
       exception_message = "this data is invalid"
 
-    elif exception_type is Client.DoesNotExist:
+    elif exception_type is Client.DoesNotExist or Session.DoesNotExist:
       exception_message = str(exception)
 
     elif exception_type is InvalidSignatureError:

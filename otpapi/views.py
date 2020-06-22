@@ -3,7 +3,7 @@ from django.http.response import JsonResponse
 from random import random
 from .models import Client, Session
 from django.views.decorators.csrf import csrf_exempt
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import EmptyResultSet
 from .token import Token
 
 form_phone_number = "phone"
@@ -16,11 +16,11 @@ form_change_name = "new_name"
 def enter(request):
   user_agent = request.META.get("HTTP_USER_AGENT")
   if not user_agent:
-    raise FieldDoesNotExist("empty user agent")
+    raise EmptyResultSet("empty user agent")
 
   number = request.POST.get(form_phone_number)
   if not number:
-    raise FieldDoesNotExist("no number got")
+    raise EmptyResultSet("no number got")
 
   try:
     client = Client.objects.get(number=number)
@@ -34,22 +34,23 @@ def enter(request):
     Session.objects.get(client=client, user_agent=user_agent)
   except:
     session = Session(client=client , user_agent=user_agent)
-  session.save()
+    session.save()
 
   return JsonResponse({"success": True})
+
 @csrf_exempt
 def verify(request):
   user_agent = request.META.get("HTTP_USER_AGENT")
   if not user_agent:
-    raise FieldDoesNotExist("empty user agent")
+    raise EmptyResultSet("empty user agent")
 
   number = request.POST.get(form_phone_number)
   if not number:
-    raise FieldDoesNotExist("empty number")
+    raise EmptyResultSet("empty number")
 
   otp = request.POST.get(form_otp_code)
   if not otp:
-    raise FieldDoesNotExist("empty otp")
+    raise EmptyResultSet("empty otp")
 
   # TODO: fix getting session use client objects
   try:
@@ -68,14 +69,12 @@ def verify(request):
 @csrf_exempt
 def create(request):
   token_header = request.META.get("HTTP_AUTHORIZATION")
-  if not token_header:
-    return JsonResponse({"message": "your token is empty"})
 
   payload = Token.decode_token(token_header=token_header)
 
   user_agent = request.META.get("HTTP_USER_AGENT")
   if not user_agent:
-    return JsonResponse({"message": "user_agent is empty"})
+    raise EmptyResultSet("empty user agent")
 
   identity = payload.get("id")
   session = Session.objects.get(id=identity, user_agent=user_agent)
@@ -84,7 +83,7 @@ def create(request):
   if not client.name:
     name = request.POST.get("name")
     if not name:
-      return JsonResponse({"message": "your name is empty"})
+      raise EmptyResultSet("empty name")
     client.name = name
     
   message = "{}, successfully logged in".format(client.name)
@@ -92,17 +91,14 @@ def create(request):
   client.login()
   client.save()
     
-  return JsonResponse({"message": message})
+  return JsonResponse({"success": True})
 
 @csrf_exempt
 def change(request):
-
-  # check token
   tolen_header = request.META.get("HTTP_AUTHORIZATION")
   if not tolen_header:
-    return JsonResponse({"message": "empty token"})
+    raise EmptyResultSet("empty user agent")
 
-  # check payload
   payload = Token.decode_token(token_header=tolen_header)
   
   identity = payload.get("id")
@@ -110,14 +106,22 @@ def change(request):
   client = session.client
 
   if not client.is_auth():
-    return JsonResponse({"message": "login first"})
+    raise Exception("login first")
   
   new_name = request.POST.get(form_change_name)
   if not new_name:
-    return JsonResponse({"message": "no name got"})
+    raise EmptyResultSet("empty name")
 
-  message = "{}, you successfully change your name to {}".format(client.name, new_name)
+  former_name = client.name
   client.name = new_name
+
+  try:
+    name_not_valid = int(new_name)
+    raise Exception("fill digits not numebr")
+  except ValueError as exception:
+    pass
+
   client.save()
+  message = "{former_name}, you successfully change your name to {new_name}".format(former_name=former_name, new_name=new_name)
 
   return JsonResponse({"message": message})
