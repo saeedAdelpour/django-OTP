@@ -3,7 +3,7 @@ from django.http.response import JsonResponse
 from random import random
 from .models import Client, Session
 from django.views.decorators.csrf import csrf_exempt
-import jwt
+from .token import Token
 
 form_phone_number = "phone"
 form_otp_code = "code"
@@ -61,7 +61,7 @@ def verify(request):
     return JsonResponse({"message": "invalid data"})
 
   payload = {"id": session.id}
-  token = jwt.encode(payload, key, algorithm).decode("utf-8")
+  token = Token.get_token(payload=payload)
   # client.set_none_otp()
   # client.save()
 
@@ -73,11 +73,7 @@ def create(request):
   if not token_header:
     return JsonResponse({"message": "your token is empty"})
 
-  token = token_header[7:]
-  try:
-    payload = jwt.decode(token, key, algorithm)
-  except:
-    return JsonResponse({"message": "invalid data form token got"})
+  payload = Token.decode_token(token_header=token_header)
 
   user_agent = request.META.get("HTTP_USER_AGENT")
   if not user_agent:
@@ -109,11 +105,7 @@ def change(request):
     return JsonResponse({"message": "empty token"})
 
   # check payload
-  token = tolen_header[7:]
-  try:
-    payload = jwt.decode(token, key, algorithm)
-  except:
-    return JsonResponse({"message": "invalid token"})
+  payload = Token.decode_token(token_header=tolen_header)
   
   identity = payload.get("id")
   session = Session.objects.get(id=identity)
