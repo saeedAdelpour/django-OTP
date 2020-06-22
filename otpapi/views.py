@@ -3,43 +3,40 @@ from django.http.response import JsonResponse
 from random import random
 from .models import Client, Session
 from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import FieldDoesNotExist
 from .token import Token
 
 form_phone_number = "phone"
 form_otp_code = "code"
 form_change_name = "new_name"
+  # TODO: validate number by regex
+  # TODO: use custom exception classes and catch them in exception handler middleware
 
 @csrf_exempt
 def enter(request):
   user_agent = request.META.get("HTTP_USER_AGENT")
   if not user_agent:
-    return JsonResponse({"message": "empty user agent"})
+    raise FieldDoesNotExist("empty user agent")
 
   number = request.POST.get(form_phone_number)
   if not number:
-    return JsonResponse({"message": "enter number"})
+    raise FieldDoesNotExist("no number got")
 
   try:
     client = Client.objects.get(number=number)
-    message = "got your account"
   except:
     client = Client(number=number)
-    message = "create new account"
   
-  client.set_otp()
+  client.set_new_otp()
+  client.save()
 
   try:
-    session = Session.objects.get(client=client, user_agent=user_agent)
+    Session.objects.get(client=client, user_agent=user_agent)
   except:
     session = Session(client=client , user_agent=user_agent)
-
-  client.save()
   session.save()
-  return JsonResponse({"success": message})
 
-key = "my site is cool"
-algorithm = "HS256"
-
+  return JsonResponse({"success": True})
 @csrf_exempt
 def verify(request):
   user_agent = request.META.get("HTTP_USER_AGENT")
