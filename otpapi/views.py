@@ -41,28 +41,29 @@ def enter(request):
 def verify(request):
   user_agent = request.META.get("HTTP_USER_AGENT")
   if not user_agent:
-    return JsonResponse({"message": "empty user agent"})
+    raise FieldDoesNotExist("empty user agent")
 
   number = request.POST.get(form_phone_number)
   if not number:
-    return JsonResponse({"message": "enter phone number"})
+    raise FieldDoesNotExist("empty number")
 
   otp = request.POST.get(form_otp_code)
   if not otp:
-    return JsonResponse({"message": "enter code"})
+    raise FieldDoesNotExist("empty otp")
 
+  # TODO: fix getting session use client objects
   try:
     client = Client.objects.get(otp=otp, number=number)
     session = Session.objects.get(client=client, user_agent=user_agent)
   except:
-    return JsonResponse({"message": "invalid data"})
+    raise Client.DoesNotExist("client not found")
 
   payload = {"id": session.id}
   token = Token.get_token(payload=payload)
   # client.set_none_otp()
   # client.save()
 
-  return JsonResponse({"message": "success", "token": token})
+  return JsonResponse({"success": True, "token": token})
 
 @csrf_exempt
 def create(request):
