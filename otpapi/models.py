@@ -7,7 +7,7 @@ class Client(models.Model):
   otp = models.IntegerField(null=True)
   logged_in = models.BooleanField(default=False)
 
-  def set_otp(self):
+  def set_new_otp(self):
     self.otp = int(random() * 10 ** 4)
   
   def set_none_otp(self):
