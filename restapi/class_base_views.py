@@ -4,26 +4,21 @@ from .serializers import SnippetSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
+from rest_framework import mixins
+from rest_framework import generics
 
-class SnippetList(APIView):
-  def get(self, request, format=None):
-    snippets = Snippet.objects.all()
-    serializer = SnippetSerializer(snippets, many=True)
-    return Response(serializer.data)
+class SnippetList(mixins.ListModelMixin,
+                  mixins.CreateModelMixin,
+                  generics.GenericAPIView):
+  queryset = Snippet.objects.all()
+  serializer_class = SnippetSerializer
 
-  def post(self, request, format=None):
-    serializer = SnippetSerializer(data=request.data)
-    if serializer.is_valid():
-      serializer.save()
-      return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+  def get(self, request, *args, **kwargs):
+    return self.list(request, *args, **kwargs)
 
-class SnippetDetail(APIView):
-  def get_object(self, pk):
-    try:
-      return Snippet.objects.get(pk=pk)
-    except Snippet.DoesNotExist:
-      raise Http404
+  def post(self, request, *args, **kwargs):
+      return self.create(request, *args, **kwargs)
+
 
   def get(self, request, pk, format=None):
     snippet = self.get_object(pk)
