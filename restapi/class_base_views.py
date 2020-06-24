@@ -1,11 +1,12 @@
 from rest_framework.views import APIView
 from .models import Snippet
-from .serializers import SnippetSerializer
+from .serializers import SnippetSerializer, UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
 from rest_framework import mixins
 from rest_framework import generics
+from django.contrib.auth.models import User
 
 class SnippetList(mixins.ListModelMixin,
                   mixins.CreateModelMixin,
@@ -18,6 +19,7 @@ class SnippetList(mixins.ListModelMixin,
 
   def post(self, request, *args, **kwargs):
       return self.create(request, *args, **kwargs)
+
 
 class SnippetDetail(mixins.RetrieveModelMixin,
                     mixins.UpdateModelMixin,
@@ -35,3 +37,13 @@ class SnippetDetail(mixins.RetrieveModelMixin,
 
   def delete(self, request, *args, **kwargs):
     return super().destroy(request, *args, **kwargs)
+
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
