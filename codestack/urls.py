@@ -26,6 +26,9 @@ urlpatterns = [
     path('someview/', MyTemplateView.as_view(template_name='products/template.html'), name='someview'),
     path('verify/', include('otpverify.urls')),
     path('api/', include('otpapi.urls')),
-    path('rest-api/', include('restapi.urls')),
+    path('api-auth/', include('restapi.urls')),
+]
 
+urlpatterns += [
+    path('api-auth/', include('rest_framework.urls')),
 ]
