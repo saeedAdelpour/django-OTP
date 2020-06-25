@@ -7,6 +7,7 @@ from django.http import Http404
 from rest_framework import mixins
 from rest_framework import generics
 from django.contrib.auth.models import User
+from rest_framework import permissions
 from .permissions import IsOwnerOrReadOnly
 
 class SnippetList(mixins.ListModelMixin,
@@ -33,7 +34,7 @@ class SnippetDetail(mixins.RetrieveModelMixin,
   
   queryset = Snippet.objects.all()
   serializer_class = SnippetSerializer
-  permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+  permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
   def get(self, request, *args, **kwargs):
     return super().retrieve(request, *args, **kwargs)
