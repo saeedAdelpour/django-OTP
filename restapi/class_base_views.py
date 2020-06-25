@@ -9,6 +9,7 @@ from rest_framework import generics
 from django.contrib.auth.models import User
 from rest_framework import permissions, renderers
 from .permissions import IsOwnerOrReadOnly
+from rest_framework import viewsets
 
 class SnippetHighlight(generics.GenericAPIView):
   queryset = Snippet.objects.all()
@@ -53,6 +54,14 @@ class SnippetDetail(mixins.RetrieveModelMixin,
 
   def delete(self, request, *args, **kwargs):
     return super().destroy(request, *args, **kwargs)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+  """
+  This viewset automatically provides `list` and `detail` actions.
+  """
+  queryset = User.objects.all()
+  serializer_class = UserSerializer
 
 
 class UserList(generics.ListAPIView):
