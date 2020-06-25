@@ -7,8 +7,17 @@ from django.http import Http404
 from rest_framework import mixins
 from rest_framework import generics
 from django.contrib.auth.models import User
-from rest_framework import permissions
+from rest_framework import permissions, renderers
 from .permissions import IsOwnerOrReadOnly
+
+class SnippetHighlight(generics.GenericAPIView):
+  queryset = Snippet.objects.all()
+  renderer_classes = [renderers.StaticHTMLRenderer]
+
+  def get(self, request, *args, **kwargs):
+    snippet = self.get_object()
+    return Response(snippet.highlighted)
+
 
 class SnippetList(mixins.ListModelMixin,
                   mixins.CreateModelMixin,
