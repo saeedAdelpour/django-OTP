@@ -9,8 +9,6 @@ from .token import Token
 form_phone_number = "phone"
 form_otp_code = "code"
 form_change_name = "new_name"
-  # TODO: validate number by regex
-  # TODO: use custom exception classes and catch them in exception handler middleware
 
 @csrf_exempt
 def enter(request):

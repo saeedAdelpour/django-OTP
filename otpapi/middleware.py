@@ -26,7 +26,7 @@ class SimpleMiddleware:
   def process_view(self, request, view_func, view_args, view_kwargs):
     pass
     # print("process_view: in process_view")
-  ValueError
+
   def process_exception(self, request, exception):
     exception_type = type(exception)
     
