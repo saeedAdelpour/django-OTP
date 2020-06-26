@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'otpverify.apps.OtpverifyConfig',
     'otpapi.apps.OtpapiConfig',
     'restapi.apps.RestapiConfig',
+    'drink.apps.DrinkConfig',
 ]
 
 MIDDLEWARE = [
