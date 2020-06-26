@@ -11,6 +11,10 @@ class DrinkViewSet(viewsets.ModelViewSet):
   serializer_class = DrinkSerializer
   permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
+  def perform_create(self, serializer):
+    serializer.save(owner=self.request.user)
+
+
 class UserViewSet(viewsets.ModelViewSet):
   queryset = User.objects.all()
   serializer_class = UserSerializer
