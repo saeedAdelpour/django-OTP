@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'otpapi.apps.OtpapiConfig',
     'restapi.apps.RestapiConfig',
     'drink.apps.DrinkConfig',
+    'core.apps.CoreConfig',
 ]
 
 MIDDLEWARE = [
