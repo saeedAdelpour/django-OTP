@@ -16,11 +16,11 @@ class DrinkViewSet(viewsets.ModelViewSet):
     request_addition_filter = self.request.query_params.get("addition")
 
     if request_name_filter and request_addition_filter:
-      queryset = Drink.objects.filter(name__icontains=request_name_filter, addition=request_name_filter)
+      queryset = Drink.objects.filter(name__icontains=request_name_filter, addition=request_addition_filter)
     elif request_name_filter:
       queryset = Drink.objects.filter(name__icontains=request_name_filter)
     elif request_addition_filter:
-      queryset = Drink.objects.filter(addition=request_name_filter)
+      queryset = Drink.objects.filter(addition=request_addition_filter)
     else:
       queryset = Drink.objects.all()
 
