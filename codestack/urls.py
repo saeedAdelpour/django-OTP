@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/', include('otpapi.urls')),
     path('api-auth/', include('restapi.urls')),
     path('api-drink/', include('drink.urls')),
+    path('core/', include('core.urls')),
 ]
 
 urlpatterns += [
