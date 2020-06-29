@@ -7,9 +7,6 @@ from django.core.exceptions import EmptyResultSet
 from .token import Token
 from .validators import number_valid, useragent_valid, otp_valid, name_valid, token_valid
 
-form_name = "name"
-form_change_name = "new_name"
-
 @csrf_exempt
 def enter(request):
   user_agent = useragent_valid(request)
@@ -67,9 +64,7 @@ def create(request):
   client = session.client
 
   if not client.name:
-    
-
-    name = name_valid(request, form_name)
+    name = name_valid(request)
     client.name = name
     
   message = "{}, successfully logged in".format(client.name)
@@ -92,7 +87,7 @@ def change(request):
   if not client.is_auth():
     raise Exception("login first")
   
-  new_name = name_valid(request, form_change_name)
+  new_name = name_valid(request)
 
   former_name = client.name
   client.name = new_name

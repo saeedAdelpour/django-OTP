@@ -2,7 +2,6 @@ from django.core.exceptions import ValidationError, EmptyResultSet
 
 form_phone_number = "phone"
 form_otp_code = "code"
-form_change_name = "new_name"
 form_name = "name"
 request_useragent = "HTTP_USER_AGENT"
 request_token = "HTTP_AUTHORIZATION"
@@ -39,7 +38,7 @@ def otp_valid(request):
   return otp
 
 
-def name_valid(request, form_label):
+def name_valid(request):
   name = request.POST.get(form_name)
   if is_int(name):
     raise ValidationError("enter string for name not number")
@@ -52,6 +51,7 @@ def token_valid(request):
   token_header = request.META.get(request_token)
   if not token_header:
     raise EmptyResultSet("empty user token")
+  return token_header
 
 
 def get_num_len(num):
