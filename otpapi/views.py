@@ -5,20 +5,16 @@ from .models import Client, Session
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import EmptyResultSet
 from .token import Token
+from .validators import number_valid, useragent_valid, otp_valid, name_valid, token_valid
 
-form_phone_number = "phone"
-form_otp_code = "code"
+form_name = "name"
 form_change_name = "new_name"
 
 @csrf_exempt
 def enter(request):
-  user_agent = request.META.get("HTTP_USER_AGENT")
-  if not user_agent:
-    raise EmptyResultSet("empty user agent")
+  user_agent = useragent_valid(request)
 
-  number = request.POST.get(form_phone_number)
-  if not number:
-    raise EmptyResultSet("no number got")
+  number = number_valid(request)
 
   try:
     client = Client.objects.get(number=number)
@@ -38,17 +34,11 @@ def enter(request):
 
 @csrf_exempt
 def verify(request):
-  user_agent = request.META.get("HTTP_USER_AGENT")
-  if not user_agent:
-    raise EmptyResultSet("empty user agent")
+  user_agent = useragent_valid(request)
 
-  number = request.POST.get(form_phone_number)
-  if not number:
-    raise EmptyResultSet("empty number")
+  number = number_valid(request)
 
-  otp = request.POST.get(form_otp_code)
-  if not otp:
-    raise EmptyResultSet("empty otp")
+  otp = otp_valid(request)
 
   # TODO: fix getting session use client objects
   try:
@@ -66,22 +56,20 @@ def verify(request):
 
 @csrf_exempt
 def create(request):
-  token_header = request.META.get("HTTP_AUTHORIZATION")
+  token_header = token_valid(request)
 
   payload = Token.decode_token(token_header=token_header)
 
-  user_agent = request.META.get("HTTP_USER_AGENT")
-  if not user_agent:
-    raise EmptyResultSet("empty user agent")
+  user_agent = useragent_valid(request)
 
   identity = payload.get("id")
   session = Session.objects.get(id=identity, user_agent=user_agent)
   client = session.client
 
   if not client.name:
-    name = request.POST.get("name")
-    if not name:
-      raise EmptyResultSet("empty name")
+    
+
+    name = name_valid(request, form_name)
     client.name = name
     
   message = "{}, successfully logged in".format(client.name)
@@ -93,11 +81,9 @@ def create(request):
 
 @csrf_exempt
 def change(request):
-  tolen_header = request.META.get("HTTP_AUTHORIZATION")
-  if not tolen_header:
-    raise EmptyResultSet("empty user agent")
+  token_header = token_valid(request)
 
-  payload = Token.decode_token(token_header=tolen_header)
+  payload = Token.decode_token(token_header=token_header)
   
   identity = payload.get("id")
   session = Session.objects.get(id=identity)
@@ -106,18 +92,10 @@ def change(request):
   if not client.is_auth():
     raise Exception("login first")
   
-  new_name = request.POST.get(form_change_name)
-  if not new_name:
-    raise EmptyResultSet("empty name")
+  new_name = name_valid(request, form_change_name)
 
   former_name = client.name
   client.name = new_name
-
-  try:
-    name_not_valid = int(new_name)
-    raise Exception("fill digits not numebr")
-  except ValueError as exception:
-    pass
 
   client.save()
   message = "{former_name}, you successfully change your name to {new_name}".format(former_name=former_name, new_name=new_name)
