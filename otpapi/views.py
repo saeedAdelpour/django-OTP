@@ -72,7 +72,7 @@ def create(request):
   client.login()
   client.save()
     
-  return JsonResponse({"success": True})
+  return JsonResponse({"success": True, "message": message})
 
 @csrf_exempt
 def change(request):
@@ -95,4 +95,4 @@ def change(request):
   client.save()
   message = "{former_name}, you successfully change your name to {new_name}".format(former_name=former_name, new_name=new_name)
 
-  return JsonResponse({"message": message})
+  return JsonResponse({"success": True, "message": message})
